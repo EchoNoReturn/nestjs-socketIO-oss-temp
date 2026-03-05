@@ -1,0 +1,67 @@
+port: 8080
+
+auth:
+  jwtSecret: "tt-unity-game-secret"
+  jwtExpiresIn: "1h"
+  # Single-session login: when enabled, a new login invalidates previous tokens
+  # (works across multi-instance because validation uses Redis).
+  singleSession: true
+  # Single-instance only: immediately disconnect old WebSocket connections on new login.
+  # For multi-instance, see README for required changes.
+  wsKickOnLogin: true
+
+db:
+  type: "mysql"
+  host: "localhost"
+  port: 5432
+  username: "postgres"
+  password: "postgres"
+  database: "tt_unity_game"
+  synchronize: true
+
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: "redis"
+
+oss:
+  type: "minio"
+  endpoint: "http://localhost:9000"
+  accessKeyId: "minioadmin"
+  accessKeySecret: "minioadmin"
+  bucket: "files"
+  region: "us-east-1"
+  useSSL: false
+  forcePathStyle: true
+
+id:
+  snowflake:
+    # Worker id for snowflake generator (0-1023). Must be UNIQUE across instances.
+    # You can also set env `SNOWFLAKE_WORKER_ID` (preferred) or `SNOWFLAKE_MACHINE_ID` (compat).
+    workerId: 0
+    # Optional custom epoch (milliseconds). You can also set env `SNOWFLAKE_EPOCH`.
+    # epoch: 1597017600000
+
+# Mail infrastructure (SMTP)
+mail:
+  enabled: false
+  # Default From header, e.g. "ToughBlocks <no-reply@example.com>"
+  from: "ToughBlocks <no-reply@example.com>"
+  # Template root directory. Each template lives at:
+  #   <templatesDir>/<templateName>/{subject.hbs,text.hbs,html.hbs}
+  templatesDir: "config/templates/mail"
+  smtp:
+    host: "smtp.example.com"
+    port: 587
+    secure: false
+    auth:
+      # Some SMTP providers support token-only auth. If `user` is omitted,
+      # the service falls back to a default username ("apikey").
+      # If your provider requires a specific username, set it explicitly.
+      # user: "smtp-user"
+      pass: "smtp-pass-or-token"
+
+# Reserved template directory for SMS (not implemented yet)
+sms:
+  templatesDir: "config/templates/sms"

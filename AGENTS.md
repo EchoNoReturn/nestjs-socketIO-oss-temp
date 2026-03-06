@@ -59,9 +59,21 @@ pnpm exec eslint "{src,apps,libs,test}/**/*.ts"
 
 ### Imports
 
-- Order: NestJS (`@nestjs/*`), other deps, local relative imports.
+- Order: NestJS (`@nestjs/*`), other deps, blank line, local parent/infrastructure imports, blank line, local sibling imports.
 - Use `import type { ... }` for types.
 - Do not introduce path aliases unless the repo already uses/configures them.
+- Example ordering:
+
+  ```typescript
+  import { Injectable } from '@nestjs/common';
+  import { InjectRepository } from '@nestjs/typeorm';
+  import { Repository } from 'typeorm';
+
+  import { SnowflakeService } from '../infrastructure/id/snowflake.service';
+
+  import { User } from './entities/user.entity';
+  import { RegisterUserDto } from './dto/register-user.dto';
+  ```
 
 ### Naming
 

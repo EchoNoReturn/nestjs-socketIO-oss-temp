@@ -20,9 +20,9 @@ export interface UserPublic {
   email: string | null;
   phoneAreaCode: string | null;
   phoneNumber: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  createdAt: number;
+  updatedAt: number;
+  deletedAt: number | null;
 }
 
 export interface LoginResult {
@@ -102,9 +102,9 @@ export class UserService {
       email: user.email ?? null,
       phoneAreaCode: user.phoneAreaCode ?? null,
       phoneNumber: user.phoneNumber ?? null,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      deletedAt: user.deletedAt ?? null,
+      createdAt: Number(user.createdAt),
+      updatedAt: Number(user.updatedAt),
+      deletedAt: user.deletedAt ? Number(user.deletedAt) : null,
     };
   }
 

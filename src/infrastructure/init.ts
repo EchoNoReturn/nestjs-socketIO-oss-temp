@@ -9,6 +9,7 @@ import { OssConfigInfo, RedisConfigInfo } from './config/config.interfaces';
 import { OssModule } from './oss/oss.module';
 import { MailModule } from './mail/mail.module';
 import { IdModule } from './id/id.module';
+import { ConstantModule } from '../constants/constant.module';
 
 /**
  * 构建 OSS 模块配置
@@ -114,5 +115,6 @@ export function initializeInfrastructureModules(): (
     buildRedisModuleConfig(),
     MailModule,
     IdModule,
+    ConstantModule,
   ];
 }

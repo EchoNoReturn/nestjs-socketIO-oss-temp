@@ -1,0 +1,20 @@
+CREATE TABLE `sys_user_third_party_login` (
+    `id` bigint UNSIGNED NOT NULL COMMENT '第三方登录主键ID',
+    `userId` bigint UNSIGNED NOT NULL COMMENT '用户ID',
+    `type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '第三方类型（如google/apple/wechat/github等）',
+    `canonicalId` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '第三方规范化唯一ID（type维度内唯一）',
+    `displayName` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '第三方展示名',
+    `avatarUrl` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '头像URL',
+    `email` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '第三方邮箱（如有）',
+    `phoneNumber` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '第三方手机号（如有）',
+    `extraJson` json NULL COMMENT '第三方扩展信息（原始payload/字段补充）',
+    `createdAt` bigint UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间（毫秒时间戳）',
+    `updatedAt` bigint UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间（毫秒时间戳）',
+    `deletedAt` bigint UNSIGNED NULL DEFAULT NULL COMMENT '软删除时间（毫秒时间戳）',
+    `sortedNum` int NOT NULL DEFAULT 1 COMMENT '排序值',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `idx_type_canonical` (`type`, `canonicalId`) COMMENT '第三方身份唯一索引（type+canonical_id）',
+    UNIQUE INDEX `idx_user_type` (`userId`, `type`) COMMENT '用户同一第三方类型唯一索引',
+    INDEX `idx_user_id_created` (`userId`, `createdAt`) COMMENT '用户ID+创建时间索引',
+    INDEX `idx_deleted_created` (`deletedAt`, `createdAt`) COMMENT '软删除+创建时间索引'
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户第三方登录信息表（支持多方式绑定）';

@@ -1,68 +1,49 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  Index,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 
-@Entity({ name: 'user' })
+import { BaseModel } from '../../infrastructure/db/base.model';
+
+@Entity({ name: 'sys_user' })
 @Index('idx_phone', ['phoneAreaCode', 'phoneNumber'], { unique: true })
 @Index('idx_deleted_created', ['deletedAt', 'createdAt'])
-export class User {
-  @PrimaryColumn({ type: 'bigint', unsigned: true })
-  id: string;
-
+export class User extends BaseModel {
   @Index('idx_username', { unique: true })
   @Column({
-    name: 'username',
     type: 'varchar',
     length: 64,
     nullable: true,
+    comment: '用户名（登录用）',
   })
   username: string | null;
 
   @Column({
-    name: 'password_hash',
     type: 'varchar',
     length: 255,
-    select: false,
+    comment: '密码哈希值',
   })
   passwordHash: string;
 
   @Index('idx_email', { unique: true })
   @Column({
-    name: 'email',
     type: 'varchar',
     length: 128,
     nullable: true,
+    comment: '邮箱（登录用）',
   })
   email: string | null;
 
   @Column({
-    name: 'phone_area_code',
     type: 'varchar',
     length: 10,
     nullable: true,
+    comment: '手机号区号（如+86）',
   })
   phoneAreaCode: string | null;
 
   @Column({
-    name: 'phone_number',
     type: 'varchar',
     length: 20,
     nullable: true,
+    comment: '手机号（登录用）',
   })
   phoneNumber: string | null;
-
-  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
-  updatedAt: Date;
-
-  @DeleteDateColumn({ name: 'deleted_at', type: 'datetime', nullable: true })
-  deletedAt: Date | null;
 }

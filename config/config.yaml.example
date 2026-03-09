@@ -25,15 +25,15 @@ redis:
   db: 0
   password: "redis"
 
-oss:
-  type: "minio"
-  endpoint: "http://localhost:9000"
-  accessKeyId: "minioadmin"
-  accessKeySecret: "minioadmin"
-  bucket: "files"
-  region: "us-east-1"
-  useSSL: false
-  forcePathStyle: true
+# oss:
+#   type: "minio"
+#   endpoint: "http://localhost:9000"
+#   accessKeyId: "minioadmin"
+#   accessKeySecret: "minioadmin"
+#   bucket: "files"
+#   region: "us-east-1"
+#   useSSL: false
+#   forcePathStyle: true
 
 id:
   snowflake:
@@ -63,5 +63,5 @@ mail:
       pass: "smtp-pass-or-token"
 
 # Reserved template directory for SMS (not implemented yet)
-sms:
-  templatesDir: "config/templates/sms"
+# sms:
+#   templatesDir: "config/templates/sms"

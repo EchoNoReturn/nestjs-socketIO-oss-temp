@@ -14,7 +14,7 @@ import { ConstantModule } from '../constants/constant.module';
 /**
  * 构建 OSS 模块配置
  */
-function buildOssModuleConfig(): DynamicModule {
+export function buildOssModuleConfig(): DynamicModule {
   return OssModule.forRootAsync({
     useFactory: (configService: ConfigService) => {
       const ossConfig = configService.get<OssConfigInfo>('config.oss');
@@ -110,7 +110,7 @@ export function initializeInfrastructureModules(): (
       load: [configurationLoader],
       ignoreEnvFile: false,
     }),
-    buildOssModuleConfig(),
+    // buildOssModuleConfig(),
     buildDatabaseModuleConfig(),
     buildRedisModuleConfig(),
     MailModule,

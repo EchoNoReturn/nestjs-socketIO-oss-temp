@@ -2,7 +2,7 @@
 
 NestJS (TypeScript ES2023) service using **pnpm**, Jest, ESLint, Prettier, TypeORM (MySQL), Redis (ioredis), Swagger, and socket.io.
 
-No agent rule files are present: no `.cursor/rules/**`, `.cursorrules`, or `.github/copilot-instructions.md`.
+Project-level rules for AI agents are in `.claude/CLAUDE.md`.
 
 ## Commands
 
@@ -190,6 +190,35 @@ describe('MailService', () => {
   - `InternalServerErrorException` — unexpected failures
 - For WebSockets, wrap with `WsException(...)`.
 - Never leak raw database errors or stack traces to clients.
+- **All exception message strings must be written in English (en-US)**, including template literals.
+
+```typescript
+// Correct
+throw new UnauthorizedException('This account has been deactivated.');
+throw new BadRequestException(`Third-party type '${type}' is not supported`);
+
+// Incorrect
+throw new UnauthorizedException('用户账号已被注销');
+```
+
+## Comments Language
+
+- **All JSDoc / block comments (`/** ... \*/`) must be written in Simplified Chinese (简体中文).\*\*
+- Inline `//` comments may be in Chinese or English, but be consistent within a file.
+
+```typescript
+// Correct
+/**
+ * 根据用户ID查询用户信息，若不存在则抛出 NotFoundException。
+ */
+async findById(id: string): Promise<User> { ... }
+
+// Incorrect
+/**
+ * Finds a user by ID, throws NotFoundException if not found.
+ */
+async findById(id: string): Promise<User> { ... }
+```
 
 ## Dependency Changes
 

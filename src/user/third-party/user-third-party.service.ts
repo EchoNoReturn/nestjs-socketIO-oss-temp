@@ -49,7 +49,9 @@ export class UserThirdPartyService {
     // 1. 获取第三方配置
     const config = await this.getThirdPartyConfig();
     if (!config[dto.type]) {
-      throw new BadRequestException(`第三方类型 '${dto.type}' 未配置验证地址`);
+      throw new BadRequestException(
+        `Third-party type '${dto.type}' has no verification endpoint configured`,
+      );
     }
 
     // 对 dto.headers 做白名单过滤，只透传允许的请求头，防止注入 Authorization / Host 等敏感头
@@ -73,7 +75,7 @@ export class UserThirdPartyService {
 
     if (!thirdPartyUser || !thirdPartyUser.id) {
       throw new UnauthorizedException(
-        `第三方登录(${dto.type})验证失败，未返回有效用户信息`,
+        `Third-party login (${dto.type}) verification failed: no valid user info returned`,
       );
     }
 
@@ -95,7 +97,7 @@ export class UserThirdPartyService {
 
     if (!configStr) {
       throw new InternalServerErrorException(
-        '第三方登录配置缺失，请联系管理员',
+        'Third-party login configuration is missing. Please contact the administrator.',
       );
     }
 
@@ -105,7 +107,7 @@ export class UserThirdPartyService {
       return JSON.parse(trimmedConfigStr) as ThirdPartyConfig;
     } catch {
       throw new InternalServerErrorException(
-        '第三方登录配置格式错误，请联系管理员',
+        'Third-party login configuration is malformed. Please contact the administrator.',
       );
     }
   }
@@ -138,12 +140,14 @@ export class UserThirdPartyService {
     });
 
     if (!user) {
-      throw new InternalServerErrorException('用户数据异常，请联系管理员');
+      throw new InternalServerErrorException(
+        'User data inconsistency detected. Please contact the administrator.',
+      );
     }
 
     // 4. 检查用户是否已注销
     if (user.deletedAt) {
-      throw new UnauthorizedException('用户账号已被注销');
+      throw new UnauthorizedException('This account has been deactivated.');
     }
 
     // 5. 返回正常用户
@@ -223,7 +227,7 @@ export class UserThirdPartyService {
 
     if (exists) {
       throw new ConflictException(
-        '该邮箱已被其他账户使用，请使用其他登录方式或联系管理员',
+        'This email is already associated with another account. Please use a different login method or contact the administrator.',
       );
     }
   }

@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,22 +11,27 @@ import { DataSource, IsNull, Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { randomUUID } from 'node:crypto';
 
-import { ConstantService } from '../constants/constant.service';
-import { SnowflakeService } from '../infrastructure/id/snowflake.service';
+import { ConstantService } from '../../constants/constant.service';
+import { SnowflakeService } from '../../infrastructure/id/snowflake.service';
 
-import { User } from './entities/user.entity';
+import { User } from '../entities/user.entity';
+import type { UserPublic, LoginResult } from '../user.service';
+
 import { UserThirdPartyLogin } from './entities/user-third-party-login.entity';
-import type { UserPublic, LoginResult } from './user.service';
 import type { ThirdPartyLoginDto } from './dto/third-party-login.dto';
+import { ALLOWED_EXTRA_HEADER_KEYS } from './dto/third-party-login.dto';
 import type {
   ThirdPartyUserInfo,
   ThirdPartyConfig,
 } from './interfaces/third-party-user.interface';
+import { verifyThirdParty } from './providers';
 
 const BCRYPT_SALT_ROUNDS = 12;
 
 @Injectable()
 export class UserThirdPartyService {
+  private readonly logger = new Logger(UserThirdPartyService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -42,18 +48,34 @@ export class UserThirdPartyService {
   async login(dto: ThirdPartyLoginDto): Promise<LoginResult> {
     // 1. 获取第三方配置
     const config = await this.getThirdPartyConfig();
-    const verifyUrl = config[dto.type];
-
-    if (!verifyUrl) {
+    if (!config[dto.type]) {
       throw new BadRequestException(`第三方类型 '${dto.type}' 未配置验证地址`);
     }
 
-    // 2. 验证 token（预留）
-    const thirdPartyUser = await this.verifyThirdPartyToken(
+    // 对 dto.headers 做白名单过滤，只透传允许的请求头，防止注入 Authorization / Host 等敏感头
+    const safeHeaders: Record<string, string> = {};
+    if (dto.headers) {
+      for (const key of ALLOWED_EXTRA_HEADER_KEYS) {
+        if (dto.headers[key] !== undefined) {
+          safeHeaders[key] = dto.headers[key];
+        }
+      }
+    }
+
+    // 2. 验证 token，路由到对应策略
+    // TODO: 这里目前只考虑了 toughtalk 的登录，如果需要增加其他第三方登录，需要在 providers.ts 中注册对应的策略，并在这里调用
+    const thirdPartyUser = await verifyThirdParty(
       dto.type,
-      dto.verifyToken,
-      verifyUrl,
+      dto.data,
+      config,
+      safeHeaders,
     );
+
+    if (!thirdPartyUser || !thirdPartyUser.id) {
+      throw new UnauthorizedException(
+        `第三方登录(${dto.type})验证失败，未返回有效用户信息`,
+      );
+    }
 
     // 3. 查找或创建用户
     const user = await this.findOrCreateUser(dto.type, thirdPartyUser);
@@ -78,41 +100,14 @@ export class UserThirdPartyService {
     }
 
     try {
-      return JSON.parse(configStr) as ThirdPartyConfig;
+      // 给 configStr 去除首尾的呀引号
+      const trimmedConfigStr = configStr.trim().replace(/^"|"$/g, '');
+      return JSON.parse(trimmedConfigStr) as ThirdPartyConfig;
     } catch {
       throw new InternalServerErrorException(
         '第三方登录配置格式错误，请联系管理员',
       );
     }
-  }
-
-  /**
-   * 验证第三方 token（预留实现）
-   */
-  private verifyThirdPartyToken(
-    type: string,
-    token: string,
-    verifyUrl: string,
-  ): Promise<ThirdPartyUserInfo> {
-    // TODO: 实现实际的 HTTP 请求验证
-    // 当前为预留接口，等待配置实际验证地址后实现
-    //
-    // 预期实现：
-    // const response = await fetch(verifyUrl, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ token }),
-    // });
-    // if (!response.ok) {
-    //   throw new UnauthorizedException('第三方 token 验证失败');
-    // }
-    // return await response.json();
-
-    // 当前抛出未实现异常（避免 lint 错误，记录参数信息）
-    const debugInfo = { token, verifyUrl };
-    throw new BadRequestException(
-      `第三方类型 '${type}' 的 token 验证功能暂未实现，请稍后再试 ${JSON.stringify(debugInfo).substring(0, 0)}`,
-    );
   }
 
   /**

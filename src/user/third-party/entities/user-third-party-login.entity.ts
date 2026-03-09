@@ -1,6 +1,6 @@
 import { Column, Entity, Index } from 'typeorm';
 
-import { BaseModel } from '../../infrastructure/db/base.model';
+import { BaseModel } from '../../../infrastructure/db/base.model';
 
 @Entity({ name: 'sys_user_third_party_login' })
 @Index('idx_type_canonical', ['type', 'canonicalId'], { unique: true })

@@ -2,12 +2,13 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 
-import { AuthTokenService } from '../auth/auth-token.service';
-import { AuthSessionService } from '../auth/auth-session.service';
-import { JumpAuth } from '../auth/decorators/jump-auth.decorator';
-import { WsConnectionRegistryService } from '../auth/ws-connection-registry.service';
+import { AuthTokenService } from '../../auth/auth-token.service';
+import { AuthSessionService } from '../../auth/auth-session.service';
+import { JumpAuth } from '../../auth/decorators/jump-auth.decorator';
+import { WsConnectionRegistryService } from '../../auth/ws-connection-registry.service';
 
-import type { LoginWithTokenResult } from './user.controller';
+import type { LoginWithTokenResult } from '../user.controller';
+
 import { UserThirdPartyService } from './user-third-party.service';
 import { ThirdPartyLoginDto } from './dto/third-party-login.dto';
 

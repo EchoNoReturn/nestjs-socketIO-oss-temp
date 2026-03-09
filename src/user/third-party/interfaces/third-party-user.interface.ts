@@ -25,8 +25,24 @@ export interface ThirdPartyUserInfo {
  * 第三方配置结构（从常量表读取）
  */
 export interface ThirdPartyConfig {
-  toughtalk?: string;
+  toughtalk?: {
+    endpoint: string;
+    apiPath: string;
+    method: 'GET' | 'POST';
+    params?: {
+      // key: type str 形式
+      [key: string]: string;
+    };
+    query?: {
+      // key: type str 形式
+      [key: string]: string;
+    };
+    headers?: {
+      // key: type str 形式
+      [key: string]: string;
+    };
+  };
   apple?: string;
   google?: string;
-  [key: string]: string | undefined;
+  [key: string]: string | Record<string, any> | undefined;
 }

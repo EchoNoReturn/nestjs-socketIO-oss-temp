@@ -36,7 +36,7 @@ describe('MailService', () => {
     });
 
     expect(sendMailFn).toHaveBeenCalledWith({
-      from: undefined,
+      from: '"Tough Blocks Service" <donotreply@toughtalk.app>',
       to: 'test@example.com',
       subject: 'Test',
       text: 'Hello',

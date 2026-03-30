@@ -1,7 +1,7 @@
 port: 8080
 
 auth:
-  jwtSecret: "tt-unity-game-secret"
+  jwtSecret: "service-secret"
   jwtExpiresIn: "1h"
   # Single-session login: when enabled, a new login invalidates previous tokens
   # (works across multi-instance because validation uses Redis).
@@ -16,7 +16,7 @@ db:
   port: 5432
   username: "postgres"
   password: "postgres"
-  database: "tt_unity_game"
+  database: "service_db"
   synchronize: true
 
 redis:
@@ -46,8 +46,8 @@ id:
 # Mail infrastructure (SMTP)
 mail:
   enabled: false
-  # Default From header, e.g. "ToughBlocks <no-reply@example.com>"
-  from: "ToughBlocks <no-reply@example.com>"
+  # Default From header, e.g. "Service <no-reply@example.com>"
+  from: "Service <no-reply@example.com>"
   # Template root directory. Each template lives at:
   #   <templatesDir>/<templateName>/{subject.hbs,text.hbs,html.hbs}
   templatesDir: "config/templates/mail"
